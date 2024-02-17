@@ -1,0 +1,40 @@
+# Framework e Pacotes Relacionados ao Django
+Django==3.2.18             ######## Framework web em Python
+django-bootstrap-form==3.4             ######## Formulários Bootstrap para Django
+dj-config-url==0.1.1             ######## Configuração baseada em URLs para projetos Django
+dj-database-url==1.2.0             ######## Converte a URL da base de dados para a configuração do Django
+django-extensions==3.0.9             ######## Extensões úteis para projetos Django
+django-widget-tweaks==1.4.8             ######## Extensões para tags de modelo do Django
+django_cpf_cnpj
+django-cors-headers==3.7.0
+
+
+# Desenvolvimento Web
+djangorestframework==3.14.0             ######## Framework para construir APIs REST em Django
+drf-spectacular==0.26.5             ######## Ferramentas para documentação de APIs REST com o Django REST framework
+gunicorn==20.1.0             ######## Servidor web WSGI para servir aplicações web Python
+whitenoise==6.4.0             ######## Servidor de arquivos estáticos para ambientes Django
+
+# Manipulação de Dados e Formatos
+inflection==0.5.1             ######## Transformações de palavras
+jsonschema==4.19.1             ######## Implementação de Python para JSON Schema
+jsonschema-specifications==2023.7.1             ######## Especificações JSON Schema
+Pillow             ######## Biblioteca de processamento de imagens em Python
+pandas             ######## Biblioteca de análise de dados em Python
+psycopg2
+psycopg2-binary             ######## Adaptador PostgreSQL para Python
+PyYAML==6.0.1             ######## Análise YAML para Python
+python-decouple==3.3             ######## Configuração em arquivos simples para Python
+referencing==0.30.2             ######## Ferramenta para referências cruzadas em documentos
+rpds-py==0.10.6             ######## Implementação em Python para RPDS (Regulamento para Produção de Documentação Sistemática)
+six==1.12.0             ######## Pacote Python 2/3 que auxilia na escrita de código compatível com ambas as versões
+sqlparse==0.4.3            ####### # Analisador SQL em Python
+
+# Fusos Horários e Manipulação de Datas
+pytz==2023.3.post1             ######## Banco de dados de fusos horários do Python
+tzdata==2022.7             ######## Dados de fuso horário
+uritemplate==4.1.1             ######## Implementação de template de URI para Python
+
+# Manipulação de Planilhas Excel
+xlrd==1.2.0             ######## Biblioteca para leitura de dados e formatos Excel
+xlwt==1.3.0             ######## Biblioteca para gravação de dados e formatos Excel

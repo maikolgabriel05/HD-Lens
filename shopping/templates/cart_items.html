@@ -1,5 +1,4 @@
-<!-- cart_items.html -->
-{% extends "base_admin.html" %}
+{% extends "base.html" %}
 {% load static %}
 
 {% block content %}
@@ -51,23 +50,36 @@
           </tfoot>
         </table>
 
-        <!-- Botão de impressão -->
-        <button class="btn btn-primary btn-print" onclick="window.print()">Imprimir</button>
+        <!-- Botão de Impressão -->
+        <button class="imprimir-button" onclick="imprimirPagina()">Imprimir</button>
       </div>
     </div>
   </div>
 </div>
 
+<!-- Script para acionar a função de impressão -->
+<script>
+  function imprimirPagina() {
+    window.print();
+  }
+</script>
+
 <style>
-  .btn-print {
+  .imprimir-button {
     background-color: #4e73df;
-    border-color: #4e73df;
-    color: #fff; /* Cor do texto do botão */
+    color: white;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    transition: background-color 0.3s ease;
   }
 
-  /* Efeito de hover */
-  .btn-print:hover {
-    background-color: #0056b3;
+  .imprimir-button:hover {
+    background-color: #2e59d9;
   }
 </style>
 

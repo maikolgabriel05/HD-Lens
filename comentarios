@@ -1,3 +1,50 @@
+Problema com importações no projeto Django - App quebrada no FrontEnd
+
+
+
+Estou enfrentando problemas com importações no meu projeto Django, Parece que algo está saindo errado, pois a aplicação está quebrada. Eu já verifiquei as importações, tanto via CDN (para testes) quanto localmente (o foco), usando npm, etc.
+
+A aplicação deveria realizar cálculos matemáticos simples usando Vue.js como biblioteca. Quando a aplicação está isolada, funciona corretamente. No entanto, quando a integro no projeto django principal, ela fica quebrada. Mesmo depois de refazer várias coisas/caminhos, e mesmo quando o console não exibe nenhum erro, ela fica quebrada.
+
+Versões utilizadas:
+
+Python: 3.10.11 Django: 3.2.18 Bootstrap: 4.0 / 4.1.1 VueJS: 2.6.11 vue-toast-notification: 0.6.1
+
+Prints do problema em destaque: [1]: https://i.stack.imgur.com/tbP8u.png , [2]: https://imgur.com/a/he3kJEG
+
+Agradeço qualquer ajuda para identificar e resolver esse problema
+
+Meu html principal:
+
+Base_Admin.html
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin-2.min.js' %}"></script>
+
+    <!-- Page level plugins -->
+    <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="{% static 'js/demo/chart-area-demo.js' %}"></script>
+    <script src="{% static 'js/demo/chart-pie-demo.js' %}"></script>
+
+    <!-- VueJS -->
+    <script src="{% static 'node_modules/vue/dist/vue.js' %}"></script>
+
+    <!-- axios -->
+    <script src="{% static 'node_modules/axios/dist/axios.min.js' %}"></script>
+
+    <!-- vue-toast-notification -->
+    <script src="{% static 'node_modules/vue-toast-notification/dist/index.js' %}"></script>
+
+shopping.html
 {% extends "base_admin.html" %}
 {% load static %}
 
@@ -55,7 +102,8 @@
           </tbody>
         </table>
 
-        <hr>
+        <hr><hr>
+
 
         <table id="myTable" class="table table-hover table-borderless">
           <tbody>
@@ -63,7 +111,7 @@
               <td class="w40">
                 <select :id="'name'+i" class="form-control" v-model="cart.pk" @change="onProductChange(cart, $event)">
                   <option selected value="">---</option>
-                  <option v-for="product in products" :key="product.value" :value="product.value">${{ product.text }}</option>
+                  <option v-for="product in products" :key="product.value" :value="product.value">${ product.text }</option>
                 </select>
               </td>
               <td>
@@ -80,7 +128,7 @@
               <td class="w15">
                 <div class="d-flex input-group mm-2">
                   <div>R$</div>
-                  <div class="ml-auto">${ formatPrice(cart.price * cart.quantity) }</div>
+                  <div class="ml-auto">${ (cart.price * cart.quantity) | formatPrice }</div>
                 </div>
               </td>
               <td>
@@ -96,27 +144,17 @@
               <th class="text-left">R$ <span class="pull-right">${ cartValue | formatPrice }</span></th>
               <th></th>
             </tr>
+
             <tr>
-              <th class="text-left">
-                <button id="btnAddLine" class="btn btn-success" @click="addLine">
-                  <i class="fa fa-plus"></i> Adicionar
-                </button>
-              </th>
               <th colspan="2" class="text-right">
                 <button id="btnSave" class="btn btn-primary" @click="submitForm">
                   <i class="fa fa-floppy-o"></i> Salvar
-                </button>
-              </th>
-              <th class="text-right">
-                <button id="btnCancel" class="btn btn-danger" @click="resetForm">
-                  <i class="fa fa-close"></i> Cancelar
                 </button>
               </th>
             </tr>
           </tfoot>
         </table>
       </div>
-
     </div>
   </div>
 </div>
@@ -124,102 +162,5 @@
 {% endblock content %}
 
 {% block js %}
-<script>
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-axios.defaults.xsrfCookieName = 'csrftoken'
-
-const endpoint = 'http://localhost:8000/'
-
-Vue.filter("formatPrice", value => {
-  const numericValue = parseFloat(value);
-
-  if (isNaN(numericValue)) {
-    return "0,00";  // ou qualquer valor padrão desejado
-  }
-
-  return (numericValue / 1).toFixed(2).replace('.', ',').toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-});
-
-var app = new Vue({
-  el: '#app',
-  delimiters: ['${', '}'],
-  data: {
-    form: {
-      customer: null
-    },
-    cartItems: [],
-    currentProduct: {
-      pk: null,
-      quantity: 0,
-      price: 0.0
-    },
-    products: []
-  },
-  mounted() {
-    axios.get(endpoint + 'api/products/')
-      .then(response => {
-        this.products = response.data.data;
-      })
-  },
-  computed: {
-    cartValue() {
-      return this.cartItems.reduce((prev, curr) => {
-        return prev + (curr.price * curr.quantity)
-      }, 0).toFixed(2)
-    }
-  },
-  methods: {
-    submitForm() {
-      let bodyFormData = new FormData();
-
-      bodyFormData.append('products', JSON.stringify(this.cartItems));
-      bodyFormData.append('customer', JSON.stringify(this.form.customer));
-
-      axios.post('/api/shopping-items/add/', bodyFormData)
-        .then((res) => {
-          location.href = endpoint + 'shopping/cart-items/' + res.data.data
-        })
-    },
-    addProduct() {
-      this.cartItems.push(this.currentProduct)
-      this.currentProduct = {
-        pk: null,
-        quantity: 0,
-        price: 0.0
-      }
-    },
-    addLine() {
-      this.cartItems.push(
-        {
-          pk: null,
-          quantity: 0,
-          price: 0.0
-        }
-      )
-    },
-    deleteProduct(item) {
-      var idx = this.cartItems.indexOf(item)
-      this.cartItems.splice(idx, 1)
-    },
-    resetForm() {
-      this.form = {
-        customer: null
-      }
-      this.cartItems = []
-      this.currentProduct = {
-        pk: null,
-        quantity: 0,
-        price: 0.0
-      }
-    },
-    validateNumberInput(item, field) {
-      // Adicione a validação necessária aqui, por exemplo, garantir que o número seja positivo.
-      if (item[field] < 0) {
-        item[field] = 0;
-      }
-    }
-  }
-})
-</script>
-
+  <script src="{% static 'js/app.js' %}"></script>
 {% endblock js %}

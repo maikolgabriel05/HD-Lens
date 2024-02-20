@@ -5,16 +5,13 @@ import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-hcjikj=ua*%hq+_8@46$yi8k^2=+k3u2x3g^j!ye)oodfu6u1r'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'RENDER' not in os.environ
-# DEBUG = True
+DEBUG = True # Se estiver no ambiente de desenvolvimento, pode deixar como True
 
 ALLOWED_HOSTS = []
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -27,6 +24,7 @@ INSTALLED_APPS = [
     'customers.apps.CustomersConfig',
     'products.apps.ProductsConfig',
     'shopping',
+    'corsheaders',
     'rest_framework',
     'drf_spectacular',
 ]
@@ -36,9 +34,17 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",  # Adicione a origem do seu aplicativo Vue.js
+    "http://127.0.0.1:8000",  # Adicione a origem do seu aplicativo Vue.js
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -61,31 +67,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-# BD MySQL
-# DATABASES = {
-#     'default': {
-#       #'ENGINE': 'django.db.backends.postgresql',
-# 'NAME': config('NAME'),
-# 'USER': config('USER'),
-# 'PASSWORD': config('PASSWORD'),
-# 'HOST': 'db',   # Or an IP Address that your DB is hosted on
-# 'PORT': '5432',
-#     }
-# }
-
-# default_db_url = 'sqlite:///' + str(BASE_DIR / 'db.sqlite3')
-#
-# parse_database = partial(dj_database_url.parse, conn_max_age=600)
-
-# 'default': config('DATABASE_URL', default=default_db_url, cast=parse_database)
-# DATABASES = {
-#     'default': config('DATABASE_URL', default=default_db_url, cast=parse_database)
-# }
-
 
 DATABASES = {
     'default': {
@@ -97,65 +80,29 @@ DATABASES = {
     }
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
+# Restante do código sem alterações
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+# core/settings.py
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.1/topics/i18n/
-
-LANGUAGE_CODE = 'pt-br'
-
-TIME_ZONE = 'America/Sao_Paulo'
-
-USE_I18N = True
-
-USE_TZ = True
-
-
-FIXTURE_DIRS = (os.path.join(BASE_DIR, 'core', 'fixtures'),)
+# ... (outras configurações)
 
 STATIC_URL = '/static/'
-if not DEBUG:    # Tell Django to copy statics to the `staticfiles` directory
-    # in your application directory on Render.
+if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    # Turn on WhiteNoise storage backend that takes care of compressing static files
-    # and creating unique names for each version so they can safely be cached forever.
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 else:
     STATICFILES_DIRS = [os.path.join(BASE_DIR, 'templates', 'static')]
-    # PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    # STATIC_ROOT = os.path.join(PROJECT_ROOT, 'templates', 'staticfiles')
-
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'templates', 'media')
 
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# Restante do código sem alterações
+
 REST_FRAMEWORK = {
-    # YOUR SETTINGS
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -164,5 +111,4 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Your project description',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    # OTHER SETTINGS
 }

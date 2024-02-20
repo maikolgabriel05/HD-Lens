@@ -1,5 +1,5 @@
 from django.urls import path
-from myproject.shopping import views as v
+from shopping import views as v
 
 
 app_name = 'shopping'

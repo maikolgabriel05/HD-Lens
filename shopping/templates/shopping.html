@@ -6,10 +6,9 @@
 <div id="app" class="text-center">
   <div class="row">
     <div class="col-10">
-      <form action="." method="POST">
-        <input id="customer" class="form-control" type="text" v-model="form.customer" placeholder="Cliente" />
-      </form>
-
+      <select id="customerName" class="form-control" v-model="cart.customer.pk" @change="onCustomerChange(cart, $event)">
+          <option value="" disabled selected>Selecione um cliente</option>
+      </select>
       <div class="mt-4">
         <table class="table table-hover table-borderless">
           <thead>
@@ -24,10 +23,10 @@
           <tbody class="mytable">
             <tr>
               <td class="w40">
-                <select id="productName" class="form-control" v-model="currentProduct.pk" @change="onProductChange()">
-                  <option selected value="">---</option>
-                  <option v-for="product in products" :key="product.value" :value="product.value">${ product.text }</option>
-                </select>
+                  <select id="productName" class="form-control" v-model="currentProduct.pk" @change="onProductChange()">
+                    <option value="" disabled selected>Selecione um Produto</option>
+                    <option v-for="product in products" :key="product.pk" :value="product.pk">${ product.name }</option>
+                  </select>
               </td>
               <td>
                 <input id="productQuantity" class="form-control text-center" type="number" min="0" v-model="currentProduct.quantity" />
@@ -63,7 +62,7 @@
               <td class="w40">
                 <select :id="'name'+i" class="form-control" v-model="cart.pk" @change="onProductChange(cart, $event)">
                   <option selected value="">---</option>
-                  <option v-for="product in products" :key="product.value" :value="product.value">${{ product.text }}</option>
+                  <option v-for="product in products" :key="product.value" :value="product.value">${ product.text }</option>
                 </select>
               </td>
               <td>
@@ -80,7 +79,7 @@
               <td class="w15">
                 <div class="d-flex input-group mm-2">
                   <div>R$</div>
-                  <div class="ml-auto">${ formatPrice(cart.price * cart.quantity) }</div>
+                  <div class="ml-auto">${ (cart.price * cart.quantity) | formatPrice }</div>
                 </div>
               </td>
               <td>
@@ -124,102 +123,7 @@
 {% endblock content %}
 
 {% block js %}
-<script>
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-axios.defaults.xsrfCookieName = 'csrftoken'
 
-const endpoint = 'http://localhost:8000/'
-
-Vue.filter("formatPrice", value => {
-  const numericValue = parseFloat(value);
-
-  if (isNaN(numericValue)) {
-    return "0,00";  // ou qualquer valor padrão desejado
-  }
-
-  return (numericValue / 1).toFixed(2).replace('.', ',').toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-});
-
-var app = new Vue({
-  el: '#app',
-  delimiters: ['${', '}'],
-  data: {
-    form: {
-      customer: null
-    },
-    cartItems: [],
-    currentProduct: {
-      pk: null,
-      quantity: 0,
-      price: 0.0
-    },
-    products: []
-  },
-  mounted() {
-    axios.get(endpoint + 'api/products/')
-      .then(response => {
-        this.products = response.data.data;
-      })
-  },
-  computed: {
-    cartValue() {
-      return this.cartItems.reduce((prev, curr) => {
-        return prev + (curr.price * curr.quantity)
-      }, 0).toFixed(2)
-    }
-  },
-  methods: {
-    submitForm() {
-      let bodyFormData = new FormData();
-
-      bodyFormData.append('products', JSON.stringify(this.cartItems));
-      bodyFormData.append('customer', JSON.stringify(this.form.customer));
-
-      axios.post('/api/shopping-items/add/', bodyFormData)
-        .then((res) => {
-          location.href = endpoint + 'shopping/cart-items/' + res.data.data
-        })
-    },
-    addProduct() {
-      this.cartItems.push(this.currentProduct)
-      this.currentProduct = {
-        pk: null,
-        quantity: 0,
-        price: 0.0
-      }
-    },
-    addLine() {
-      this.cartItems.push(
-        {
-          pk: null,
-          quantity: 0,
-          price: 0.0
-        }
-      )
-    },
-    deleteProduct(item) {
-      var idx = this.cartItems.indexOf(item)
-      this.cartItems.splice(idx, 1)
-    },
-    resetForm() {
-      this.form = {
-        customer: null
-      }
-      this.cartItems = []
-      this.currentProduct = {
-        pk: null,
-        quantity: 0,
-        price: 0.0
-      }
-    },
-    validateNumberInput(item, field) {
-      // Adicione a validação necessária aqui, por exemplo, garantir que o número seja positivo.
-      if (item[field] < 0) {
-        item[field] = 0;
-      }
-    }
-  }
-})
-</script>
+<script src="{% static 'js/app.js' %}"></script>
 
 {% endblock js %}

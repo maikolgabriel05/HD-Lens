@@ -1,13 +1,15 @@
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-axios.defaults.xsrfCookieName = 'csrftoken'
+/* stock_control/templates/static/js/app.js */
 
-const endpoint = 'http://localhost:8000/'
+axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+axios.defaults.xsrfCookieName = 'csrftoken';
 
-Vue.filter("formatPrice", value => (value / 1).toFixed(2).replace('.', ',').toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."))
+const endpoint = 'http://localhost:8000/';
+
+Vue.filter("formatPrice", value => (value / 1).toFixed(2).replace('.', ',').toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."));
 
 Vue.use(VueToast, {
   position: 'top-right'
-})
+});
 
 var app = new Vue({
   el: '#app',
@@ -27,73 +29,74 @@ var app = new Vue({
   mounted() {
     axios.get(endpoint + 'api/products/')
       .then(response => {
-        this.products = response.data.data;
+        this.products = response.data;
       })
+      .catch(error => {
+        console.error('Erro ao obter produtos:', error);
+      });
   },
   computed: {
     cartValue() {
       return this.cartItems.reduce((prev, curr) => {
-        return prev + (curr.price * curr.quantity)
-      }, 0).toFixed(2)
+        return prev + (curr.price * curr.quantity);
+      }, 0).toFixed(2);
     }
   },
   methods: {
     validateForm() {
-      if (this.cartItems.length == 0) {
-        Vue.$toast.error('O carrinho está vazio.')
-        return false
+      if (this.cartItems.length === 0) {
+        Vue.$toast.error('O carrinho está vazio.');
+        return false;
       }
-      if (this.cartItems.length == 1 & this.cartItems[0].pk === null) {
-        Vue.$toast.error('Favor escolher um produto.')
-        return false
+      if (this.cartItems.length === 1 && this.cartItems[0].pk === null) {
+        Vue.$toast.error('Favor escolher um produto.');
+        return false;
       }
-      if (this.cartItems.length == 1 & this.cartItems[0].quantity == 0) {
-        Vue.$toast.error('Quantidade deve ser maior que zero.')
-        return false
+      if (this.cartItems.length === 1 && this.cartItems[0].quantity === 0) {
+        Vue.$toast.error('Quantidade deve ser maior que zero.');
+        return false;
       }
-      if (this.cartItems.length == 1 & this.cartItems[0].price == 0) {
-        Vue.$toast.error('Preço deve ser maior que zero.')
-        return false
+      if (this.cartItems.length === 1 && this.cartItems[0].price === 0) {
+        Vue.$toast.error('Preço deve ser maior que zero.');
+        return false;
       }
       if (!this.form.customer) {
-        Vue.$toast.error('Favor digitar o nome do cliente.')
-        return false
+        Vue.$toast.error('Favor digitar o nome do cliente.');
+        return false;
       }
-      return true
+      return true;
     },
     onProductChange(cart, e) {
       if (cart) {
         const pk = e.target.value;
-        const price = this.products.find(p => p.value == pk).price;
+        const price = this.products.find(p => p.pk == pk).price;
         cart.price = price;
         return;
       }
-      const price = this.products.find(p => p.value == this.currentProduct.pk).price;
+      const price = this.products.find(p => p.pk == this.currentProduct.pk).price;
       this.currentProduct.price = price;
     },
     addProduct() {
-      this.cartItems.push(this.currentProduct)
+      this.cartItems.push(this.currentProduct);
       this.currentProduct = {
         pk: null,
         quantity: 0,
         price: 0.0
-      }
+      };
     },
     addLine() {
-      this.cartItems.push(
-        {
-          pk: null,
-          quantity: 0,
-          price: 0.0
-        }
-      )
+      this.cartItems.push({
+        pk: null,
+        quantity: 0,
+        price: 0.0
+      });
     },
     deleteProduct(item) {
-      var idx = this.cartItems.indexOf(item)
-      this.cartItems.splice(idx, 1)
+      var idx = this.cartItems.indexOf(item);
+      this.cartItems.splice(idx, 1);
     },
     submitForm() {
-      if (!this.validateForm()) return
+      if (!this.validateForm()) return;
 
       let bodyFormData = new FormData();
 
@@ -102,19 +105,22 @@ var app = new Vue({
 
       axios.post('/api/shopping-items/add/', bodyFormData)
         .then((res) => {
-          location.href = endpoint + 'shopping/cart-items/' + res.data.data
+          location.href = endpoint + 'shopping/cart-items/' + res.data.data;
         })
+        .catch(error => {
+          console.error('Erro ao submeter o formulário:', error);
+        });
     },
     resetForm() {
       this.form = {
         customer: null
-      }
-      this.cartItems = []
+      };
+      this.cartItems = [];
       this.currentProduct = {
         pk: null,
         quantity: 0,
         price: 0.0
-      }
+      };
     }
   }
-})
+});

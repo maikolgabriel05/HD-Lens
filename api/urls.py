@@ -1,6 +1,7 @@
+# api/urls.py
 from django.urls import path
-from . import views
+from .views import CustomerListView
 
 urlpatterns = [
-    # Defina suas rotas aqui
+    path('api/customers/', CustomerListView.as_view(), name='customer-list'),
 ]

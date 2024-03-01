@@ -1,7 +1,10 @@
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from core import settings
+from customers.views import CustomersListView
+from products.views import ProductsListView
 from . import views as v
 
 urlpatterns = [
@@ -12,12 +15,17 @@ urlpatterns = [
     path('dashboard/customer/', include('customers.urls')),
     path('dashboard/products/', include('products.urls')),
     path('shopping/', include('shopping.urls', namespace='shopping')),
-    path('api/products/', v.api_product, name='api_product'),
-    path('api/shopping-items/add/', v.api_shopping_items_add, name='api_shopping_items_add'),
-    path('api/v1/', include('api.urls')),
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    path('api/v1/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-]
 
-urlpatterns += staticfiles_urlpatterns()
+    # API URLs
+    path('api/', include([
+        path('customers/', CustomersListView.as_view(), name='customer_list_api'),
+        path('products/', ProductsListView.as_view(), name='products_list_api'),
+        path('api-product/', v.api_product, name='api_product'),  # Corrigido para evitar duplicação
+        path('shopping-items/add/', v.api_shopping_items_add, name='api_shopping_items_add'),
+        path('v1/', include('api.urls')),
+        path('schema/', SpectacularAPIView.as_view(), name='schema'),
+        path('schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+        path('v1/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    ])),
+]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

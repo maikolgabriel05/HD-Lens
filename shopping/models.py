@@ -1,3 +1,4 @@
+#shopping/models.py
 from django.db import models
 
 
@@ -30,7 +31,7 @@ class Product(models.Model):
         return {
             'value': self.pk,
             'text': self.name,
-            'price': self.price
+            'price': str(self.price),  # Converter o preço para uma string para garantir a formatação correta no template
         }
 
 
@@ -62,3 +63,4 @@ class Cart(models.Model):
 
     def get_subtotal(self):
         return self.price * (self.quantity or 0)
+

@@ -1,7 +1,16 @@
+# products/views.py
 from django.shortcuts import render, redirect
 from products.forms import ProductsForm
+from django.http import JsonResponse
+from django.views import View
 from products.models import Products
 
+
+class ProductsListView(View):
+    def get(self, request, *args, **kwargs):
+        products = Products.objects.all()
+        data = [{'pk': product.pk, 'name': product.name} for product in products]
+        return JsonResponse(data, safe=False)
 
 def products(request):
     template_name = 'products.html'

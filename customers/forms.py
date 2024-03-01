@@ -23,18 +23,22 @@ class CustomerForm(forms.ModelForm):
 
     def clean_cnpj(self):
         cnpj = self.cleaned_data.get('cnpj')
-        if not cnpj:
-            return cnpj  # se estiver vazio, a validação do CharField irá lidar com isso
 
-        cnpj = ''.join(filter(str.isdigit, cnpj))  # remove caracteres não numéricos
+        if not cnpj:
+            return cnpj  # Se estiver vazio, a validação do CharField irá lidar com isso
+
+        cnpj = ''.join(filter(str.isdigit, cnpj))  # Remove caracteres não numéricos
 
         if len(cnpj) == 11:
             try:
                 validate_cpf(cnpj)
             except ValidationError:
-                raise ValidationError('Por favor, insira um CPF ou CNPJ válido.')
+                raise ValidationError('Por favor, insira um CPF válido.')
         elif len(cnpj) == 14:
-            validate_cnpj(cnpj)
+            try:
+                validate_cnpj(cnpj)
+            except ValidationError:
+                raise ValidationError('Por favor, insira um CNPJ válido.')
         else:
             raise ValidationError('Por favor, insira um CPF ou CNPJ válido.')
 

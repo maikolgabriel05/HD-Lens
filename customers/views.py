@@ -1,6 +1,17 @@
+# customers/views.py
 from django.shortcuts import render, redirect
 from customers.forms import CustomerForm
 from customers.models import Customers
+from django.http import JsonResponse
+from django.views import View
+
+
+class CustomersListView(View):
+    def get(self, request, *args, **kwargs):
+        customers = Customers.objects.all()
+        data = [{'pk': customer.pk, 'name': customer.name} for customer in customers]
+        return JsonResponse(data, safe=False)
+
 
 def customers_list(request):
     template_name = 'customers.html'
@@ -15,7 +26,7 @@ def create_customer(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            return redirect('customers:customers_list')  # Alterado para 'customers_list'
+            return redirect('customers:customers_list')
         else:
             print(form.errors)
     return render(request, template_name=template_name, context=context)
@@ -27,7 +38,7 @@ def edit_customer(request, pk):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            return redirect('customers:customers_list')  # Alterado para 'customers_list'
+            return redirect('customers:customers_list')
         else:
             print(form.errors)
     context = {'form': form}
@@ -37,5 +48,5 @@ def delete_customer(request, pk):
     customer = Customers.objects.get(pk=pk)
     if request.method == 'POST':
         customer.delete()
-        return redirect('customers:customers_list')  # Alterado para 'customers_list'
+        return redirect('customers:customers_list')
     return render(request, 'delete_customer.html', {'customer': customer})
